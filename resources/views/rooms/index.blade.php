@@ -16,107 +16,117 @@
     </div>
 </nav>
 
-<header class="hero">
-    <div class="container">
-        <span class="eyebrow"><span class="dot"></span> WebXR · No app install required</span>
-        <h1>Step inside your <span class="grad">meeting rooms</span><br>in VR &amp; AR.</h1>
-        <p class="lead">
-            A showcase of architectural meeting spaces modeled in Blender — explore them in
-            immersive virtual reality, place them in your own room with AR, or look around
-            right from your phone.
-        </p>
-        <div class="hero-badges">
-            <span class="badge">🥽 <b>VR</b> headset ready</span>
-            <span class="badge">📱 <b>AR</b> on mobile</span>
-            <span class="badge">🌀 <b>360°</b> magic window</span>
-            <span class="badge">⚡ Built on <b>A-Frame</b> + WebXR</span>
+{{-- ===== Cinematic hero ===== --}}
+<header class="x-hero">
+    <div class="x-hero-bg"></div>
+    <div class="x-hero-inner">
+        <span class="x-eyebrow">IMMERSIVE MEETING ROOMS</span>
+        <h1 class="x-hero-title">The Collection</h1>
+        <p class="x-hero-sub">{{ $rooms->count() }} architectural spaces, modeled in Blender.<br>Step inside in VR, AR, or 360° &mdash; straight from your browser.</p>
+        <div class="x-hero-cta">
+            <a href="#room-{{ $rooms->first()->slug ?? '' }}" class="x-btn x-btn-primary">Explore rooms ↓</a>
+            <a href="#how" class="x-btn x-btn-ghost">How it works</a>
+        </div>
+        <div class="x-hero-modes">
+            <span>🥽 VR Headset</span><span>📦 Cardboard</span><span>📱 AR</span><span>🌀 360°</span>
         </div>
     </div>
 </header>
 
-<main class="container">
-    <section id="gallery">
-        <div class="section-head">
-            <div>
-                <h2>The Collection</h2>
-                <p>{{ $rooms->count() }} curated spaces — click any room to enter.</p>
-            </div>
-        </div>
+<main>
+    {{-- ===== One full-bleed showcase band per room (alternating) ===== --}}
+    @foreach ($rooms as $i => $room)
+        <section class="x-showcase {{ $i % 2 === 1 ? 'reverse' : '' }}"
+                 id="room-{{ $room->slug }}"
+                 style="--room-accent: {{ $room->accent }}">
+            <div class="x-showcase-inner">
 
-        <div class="grid">
-            @foreach ($rooms as $room)
-                <article class="card">
-                    <div class="card-media">
+                {{-- Visual / preview --}}
+                <div class="x-preview">
+                    <div class="x-preview-frame">
                         @if ($room->thumbnail_url)
                             <img src="{{ $room->thumbnail_url }}" alt="{{ $room->name }}" loading="lazy">
                         @else
-                            <div class="preview-fallback">
-                                <div class="ico">🏛️</div>
+                            <div class="x-preview-art">
+                                <span class="x-preview-ico">🏛️</span>
+                                <span class="x-preview-tag">Live 3D · enter to view</span>
                             </div>
                         @endif
+                    </div>
+                    <div class="x-preview-badges">
+                        <span class="x-mode-pill">VR</span>
+                        <span class="x-mode-pill">AR</span>
+                        <span class="x-mode-pill">360°</span>
+                    </div>
+                </div>
 
-                        <div class="card-tags">
-                            <span class="tag vr">VR</span>
-                            <span class="tag ar">AR</span>
+                {{-- Copy + specs --}}
+                <div class="x-copy">
+                    <span class="x-copy-eyebrow">{{ str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) }} / {{ str_pad((string)$rooms->count(), 2, '0', STR_PAD_LEFT) }}</span>
+                    <h2 class="x-copy-title">{{ $room->name }}</h2>
+                    <p class="x-copy-tagline">{{ $room->tagline }}</p>
+                    <p class="x-copy-desc">{{ $room->description }}</p>
+
+                    {{-- Big spec callouts (Xiaomi-style numbers) --}}
+                    <div class="x-specs">
+                        <div class="x-spec">
+                            <span class="x-spec-num">{{ $room->capacity }}</span>
+                            <span class="x-spec-label">Seats</span>
                         </div>
-
-                        @if ($room->model_exists)
-                            <span class="status-pill ready">● Ready</span>
-                        @else
-                            <span class="status-pill pending">● Awaiting model</span>
+                        @if (!empty($room->area))
+                        <div class="x-spec">
+                            <span class="x-spec-num">{{ $room->area }}<small>m²</small></span>
+                            <span class="x-spec-label">Floor area</span>
+                        </div>
                         @endif
-
-                        <div class="accent-bar" style="background: linear-gradient(90deg, {{ $room->accent }}, transparent)"></div>
+                        <div class="x-spec">
+                            <span class="x-spec-num">{{ count($room->features) }}</span>
+                            <span class="x-spec-label">Features</span>
+                        </div>
                     </div>
 
-                    <div class="card-body">
-                        <h3>{{ $room->name }}</h3>
-                        <p class="tagline">{{ $room->tagline }}</p>
-
-                        <div class="meta-row">
-                            <span class="meta">👥 Seats {{ $room->capacity }}</span>
-                            <span class="meta">📦 GLB model</span>
-                        </div>
-
-                        <div class="feature-chips">
-                            @foreach ($room->features as $feature)
-                                <span class="chip">{{ $feature }}</span>
-                            @endforeach
-                        </div>
-
-                        <a href="{{ route('rooms.show', $room->slug) }}" class="btn btn-primary">
-                            Enter room →
-                        </a>
+                    {{-- Feature pills --}}
+                    <div class="x-feature-pills">
+                        @foreach ($room->features as $feature)
+                            <span class="x-pill">{{ $feature }}</span>
+                        @endforeach
                     </div>
-                </article>
-            @endforeach
-        </div>
-    </section>
 
-    <section id="how">
-        <div class="section-head">
-            <div>
-                <h2>How it works</h2>
-                <p>One scan — four ways to explore.</p>
+                    <a href="{{ route('rooms.show', $room->slug) }}" class="x-btn x-btn-primary x-enter">
+                        Enter {{ $room->name }} →
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="grid">
-            <article class="card"><div class="card-body">
-                <h3>📦 Google Cardboard VR</h3>
-                <p class="tagline">Got a cheap Cardboard viewer? Tap <b>Cardboard VR</b> — the screen splits into two eyes and you look around by moving your head. <b>Look at a spot and tap to walk there.</b></p>
-            </div></article>
-            <article class="card"><div class="card-body">
-                <h3>🥽 Headset VR</h3>
-                <p class="tagline">On a Meta Quest or any WebXR headset, tap <b>Enter VR</b> and walk through the space at true scale.</p>
-            </div></article>
-            <article class="card"><div class="card-body">
-                <h3>📱 Augmented Reality</h3>
-                <p class="tagline">On a supported phone, tap <b>View in AR</b> to drop the room into your real environment and walk around it.</p>
-            </div></article>
-            <article class="card"><div class="card-body">
-                <h3>🌀 360° Magic Window</h3>
-                <p class="tagline">No viewer? Just move your phone — or drag with a mouse — to look around the room from inside.</p>
-            </div></article>
+        </section>
+    @endforeach
+
+    {{-- ===== How it works ===== --}}
+    <section id="how" class="x-how">
+        <div class="x-how-inner">
+            <span class="x-eyebrow dark">FOUR WAYS TO EXPLORE</span>
+            <h2 class="x-how-title">One scan. Every device.</h2>
+            <div class="x-how-grid">
+                <div class="x-how-card">
+                    <span class="x-how-ico">📦</span>
+                    <h3>Cardboard VR</h3>
+                    <p>Tap <b>Room View</b> — the screen splits into two eyes. Look at the floor and tap to walk. Drop the phone in a Cardboard viewer.</p>
+                </div>
+                <div class="x-how-card">
+                    <span class="x-how-ico">🥽</span>
+                    <h3>Headset VR</h3>
+                    <p>On a Meta Quest or any WebXR headset, tap <b>Enter VR</b> and walk the space at true scale.</p>
+                </div>
+                <div class="x-how-card">
+                    <span class="x-how-ico">📱</span>
+                    <h3>Augmented Reality</h3>
+                    <p>On a supported phone, tap <b>View in AR</b> to place the room in your real surroundings.</p>
+                </div>
+                <div class="x-how-card">
+                    <span class="x-how-ico">🌀</span>
+                    <h3>360° Magic Window</h3>
+                    <p>No viewer? Move your phone — or drag with a mouse — to look around from inside.</p>
+                </div>
+            </div>
         </div>
     </section>
 </main>

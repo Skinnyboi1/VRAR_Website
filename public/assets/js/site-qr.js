@@ -48,6 +48,17 @@
         })
         .catch(function () { /* keep fallback */ });
 
+    // Solidify the nav bar once the user scrolls past the hero.
+    var nav = document.querySelector('.nav');
+    if (nav) {
+        var onScroll = function () {
+            if (window.scrollY > window.innerHeight * 0.7) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    }
+
     // Collapse / expand (remembered for the session).
     if (toggle) {
         var collapsed = sessionStorage.getItem('qrCollapsed') === '1';
