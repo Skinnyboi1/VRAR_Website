@@ -1,0 +1,12 @@
+# Cache GLB models aggressively — they're versioned by filename.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(glb|gltf|bin)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# Ensure correct MIME type for GLB.
+<IfModule mod_mime.c>
+    AddType model/gltf-binary .glb
+    AddType model/gltf+json .gltf
+</IfModule>
