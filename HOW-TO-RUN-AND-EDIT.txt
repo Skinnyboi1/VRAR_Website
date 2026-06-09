@@ -1,205 +1,282 @@
 ==============================================================
-  VR / AR MEETING ROOM SHOWCASE  —  RUN & EDIT GUIDE
+  VR / AR MEETING ROOM SHOWCASE
+  STEP-BY-STEP SETUP, RUN & EDIT GUIDE
 ==============================================================
-Project folder: c:\laragon\www\vr_showcase
+This guide takes you from a BRAND-NEW, CLEAN WINDOWS COMPUTER
+all the way to seeing the rooms in VR/AR on your phone.
 
-This file explains:
-  A) How to run the app (local + phone via QR)
-  B) Where to edit common things (rooms, models, colors, text)
-  C) How to add / replace / compress a 3D model
-  D) Troubleshooting the usual problems
+Follow the parts in order:
+  PART 1 - Install everything (one time, on a new PC)
+  PART 2 - Put the project on the computer
+  PART 3 - First-time project setup (one time)
+  PART 4 - Run the app on the PC
+  PART 5 - Make it appear on your PHONE (VR / AR via QR)
+  PART 6 - Where to edit things (rooms, colors, text, models)
+  PART 7 - Troubleshooting
 
---------------------------------------------------------------
-  A) HOW TO RUN THE APP
---------------------------------------------------------------
+Tip: anything shown like   php artisan serve   is a command you
+type into PowerShell and press Enter.
 
-There are two ways. Use #1 for quick local viewing on your PC.
-Use #2 when you want to open it on a PHONE (VR / AR / QR).
+==============================================================
+  PART 1 - INSTALL EVERYTHING (one time, on a new computer)
+==============================================================
+You need 3 programs: Laragon (PHP+Composer), Node.js, and ngrok.
 
------ 1. RUN LOCALLY (PC only) -------------------------------
-  1. Open PowerShell in the project folder:
-        c:\laragon\www\vr_showcase
-  2. Run:
-        php artisan serve
-  3. Open in your browser:
-        http://127.0.0.1:8000
-  Stop it with Ctrl+C in that window.
+--- 1.1  Install Laragon (gives you PHP + Composer + a web server)
+   1. Go to:  https://laragon.org/download/
+   2. Download "Laragon - Full" and run the installer.
+   3. Click through with the default options. Install it to the
+      default location (C:\laragon).
+   4. Open Laragon. Click the "Start All" button once to confirm
+      it works (you can stop it again; we run the app another way).
 
-  NOTE: VR/AR will NOT work on a phone from this address —
-  the phone can't reach "127.0.0.1". For phones, use #2.
+   Check it worked: open PowerShell (press Start, type "PowerShell",
+   Enter) and run:
+        php -v
+   You should see "PHP 8.1" or higher. If it says php is not
+   recognized, close and reopen PowerShell, or restart the PC so
+   the PATH updates.
 
------ 2. RUN FOR PHONE (VR / AR / QR) ------------------------
-  This uses ngrok to give you a public https link the phone
-  can open (WebXR VR/AR REQUIRES https).
+--- 1.2  Install Node.js (only needed to COMPRESS 3D models)
+   1. Go to:  https://nodejs.org/
+   2. Download the "LTS" version and install it (default options).
+   3. Check: in a NEW PowerShell window, run:
+        node -v
+      You should see a version number (e.g. v20 or v24).
 
-  ONE-TIME SETUP (only needed once, ever):
-     a. Make a free account: https://dashboard.ngrok.com/signup
-     b. Copy your token from:
+--- 1.3  Install ngrok (lets your PHONE reach the site over https)
+   Easiest way (Windows 10/11 has "winget" built in). In PowerShell:
+        winget install ngrok.ngrok
+   Then CLOSE and REOPEN PowerShell so it's on your PATH. Check:
+        ngrok version
+
+   (If winget is missing: download from https://ngrok.com/download,
+    unzip ngrok.exe somewhere, and use its full path instead.)
+
+==============================================================
+  PART 2 - PUT THE PROJECT ON THE COMPUTER
+==============================================================
+The project must live inside Laragon's "www" folder.
+
+   Final location must be:   C:\laragon\www\vr_showcase
+
+   - If you have the project as a ZIP: unzip it so that the files
+     (composer.json, artisan, the app/ folder, etc.) end up directly
+     inside  C:\laragon\www\vr_showcase
+   - If you use Git:
+        1. In PowerShell run:   cd C:\laragon\www
+        2. Then:                git clone <your-repo-url> vr_showcase
+
+==============================================================
+  PART 3 - FIRST-TIME PROJECT SETUP (one time)
+==============================================================
+Open PowerShell and go into the project folder:
+        cd C:\laragon\www\vr_showcase
+
+--- 3.1  Install the PHP libraries (creates the "vendor" folder)
+        composer install
+
+--- 3.2  Create the settings file (.env) if it isn't there
+   Check if a file named ".env" exists in the folder. If NOT, run:
+        copy .env.example .env
+
+--- 3.3  Create the app key (only if APP_KEY is empty in .env)
+        php artisan key:generate
+
+--- 3.4  Install ngrok's free login token (one time, ever)
+   1. Make a free account:
+        https://dashboard.ngrok.com/signup
+   2. Copy your token from:
         https://dashboard.ngrok.com/get-started/your-authtoken
-     c. In a NEW PowerShell window, run:
-        ngrok config add-authtoken <PASTE_YOUR_TOKEN_HERE>
+   3. In PowerShell, paste it into this command:
+        ngrok config add-authtoken PASTE_YOUR_TOKEN_HERE
 
-  EVERY TIME you want phone access, just run the launcher:
-     1. Open PowerShell in the project folder.
-     2. Run:
+Setup is now done. You won't repeat Part 1-3 again on this PC.
+
+==============================================================
+  PART 4 - RUN THE APP ON THE PC
+==============================================================
+   1. Open PowerShell in the project folder:
+        cd C:\laragon\www\vr_showcase
+   2. Start the app:
+        php artisan serve
+   3. Open your browser to:
+        http://127.0.0.1:8000
+   4. To stop it: click the PowerShell window and press Ctrl+C.
+
+   You should see the gallery with the meeting rooms. Click a room
+   to walk through it on the PC (mouse to look, W/A/S/D to move,
+   or look at the floor and click to teleport).
+
+   NOTE: This 127.0.0.1 address works on the PC ONLY. A phone cannot
+   open it. For phones, use PART 5.
+
+==============================================================
+  PART 5 - MAKE IT APPEAR ON YOUR PHONE (VR / AR via QR)
+==============================================================
+Phones need a public https link (VR/AR requires https). The
+included launcher script starts the app AND the public link
+together, in one step.
+
+   1. Open PowerShell in the project folder:
+        cd C:\laragon\www\vr_showcase
+   2. Run the launcher:
         powershell -ExecutionPolicy Bypass -File .\start-showcase.ps1
-     3. It starts the server AND the tunnel. ngrok prints a line like:
+   3. Wait a few seconds. ngrok will print a line like:
         Forwarding  https://xxxx-xxxx.ngrok-free.dev -> http://localhost:8000
-     4. On your PC, open the gallery. A QR code is pinned to the
-        bottom-right corner — scan it with your phone camera.
-     5. On the phone you'll see an ngrok "Visit Site" page the first
-        time — tap "Visit Site". Then pick a room.
+      (That https link is your public address.)
+   4. On the PC, open the gallery page in your browser. A QR CODE is
+      pinned to the BOTTOM-RIGHT corner of the page.
+   5. Open the camera on your phone and point it at that QR code,
+      then tap the link it shows.
+   6. The first time, the phone shows an ngrok page that says
+      "You are about to visit..." - tap "Visit Site".
+   7. The showcase opens on your phone. Pick a room, then use:
+        - "Room View"  = look around by moving the phone; look at the
+                         floor and tap to walk. Put the phone in a
+                         Google Cardboard viewer for VR.
+        - "View in AR" = place the room in your real surroundings
+                         (Android Chrome with ARCore).
 
-  IMPORTANT: the free ngrok link CHANGES every time you restart it.
-  That's fine — the QR on the page always updates to the current link.
+   TO STOP: click the ngrok/PowerShell window and press Ctrl+C.
 
---------------------------------------------------------------
-  B) WHERE TO EDIT COMMON THINGS
---------------------------------------------------------------
+   IMPORTANT NOTES:
+     - The free ngrok link CHANGES every time you restart it. You do
+       NOT need to do anything - the QR on the page always points at
+       the current link automatically.
+     - Phone and PC do NOT need to be on the same WiFi (ngrok is a
+       public link). But the PC running the launcher must stay on.
 
->>> THE ROOMS (names, descriptions, which model, spawn point)
+==============================================================
+  PART 6 - WHERE TO EDIT THINGS
+==============================================================
+
+>>> THE ROOMS (names, text, which model, where you start)
     FILE:  config\rooms.php
-
-    Each room is a block like this:
+    Each room is a block like:
         [
-            'slug'        => 'iman-room',          // the URL: /rooms/iman-room
-            'name'        => 'Iman Meeting Room',  // title shown on the card
-            'tagline'     => '...',                // short line under the title
-            'description' => '...',                // longer description
-            'capacity'    => 8,                    // "Seats X" on the card
-            'features'    => ['A', 'B', 'C'],      // grey chips on the card
+            'slug'        => 'iman-room',           // URL: /rooms/iman-room
+            'name'        => 'Iman Meeting Room',   // card title
+            'tagline'     => '...',                 // short line
+            'description' => '...',                 // longer text
+            'capacity'    => 8,                     // "Seats X"
+            'features'    => ['A','B','C'],         // grey chips
             'model'       => 'meeting-room-iman.glb', // file in public\assets\models\
-            'thumbnail'   => 'iman-room.jpg',      // optional preview image
-            'accent'      => '#f0b89a',            // this room's accent color
-            'spawn'       => ['position' => '0 1.6 4', 'rotation' => '0 0 0'],
-            'transform'   => ['position' => '0 0 0', 'rotation' => '0 0 0', 'scale' => '1 1 1'],
+            'thumbnail'   => 'iman-room.jpg',       // optional preview image
+            'accent'      => '#f0b89a',             // this room's color
+            'spawn'       => ['position'=>'0 1.6 4','rotation'=>'0 0 0'],
+            'transform'   => ['position'=>'0 0 0','rotation'=>'0 0 0','scale'=>'1 1 1'],
         ],
+    - ADD a room: copy a whole block, paste it, change the values.
+    - HIDE a room: it hides automatically if its 'model' file is
+      missing from public\assets\models\.
+    - 'spawn' = where YOU stand when the room opens.
+        position 'X Y Z' (Y = height; 1.6 = standing eye level)
+        rotation 'X Y Z' (middle number turns you; 90 = quarter turn,
+                          180 = face backward)
+    - 'transform' = moves the MODEL itself. Use if the room loads
+      sunk in the floor (raise Y), too big/small (change scale, e.g.
+      '0.5 0.5 0.5'), or facing wrong (rotation middle number).
 
-    - To ADD a room: copy a whole block, paste it, change the values.
-    - To HIDE a room: a room is automatically hidden if its 'model'
-      file is not present in public\assets\models\.
-    - 'spawn' = where YOU stand when the room opens:
-         position = 'X Y Z'  (Y is height; 1.6 = standing eye level)
-         rotation = 'X Y Z'  (the middle number turns you left/right;
-                              e.g. '0 90 0' faces you 90° to the side,
-                              '0 180 0' faces you backward)
-    - 'transform' = moves/rotates/scales the MODEL itself:
-         use this if the room loads sunk in the floor (raise position Y),
-         too big/small (change scale, e.g. '0.5 0.5 0.5'),
-         or facing the wrong way (rotation middle number).
-
-    AFTER EDITING config\rooms.php, run this once so changes show:
+    AFTER editing config\rooms.php, run once:
         php artisan config:clear
 
-
->>> COLORS / OVERALL LOOK (the warm cream pastel theme)
+>>> COLORS / OVERALL LOOK
     FILE:  public\assets\css\app.css
+    The palette is at the very top, in ":root { ... }". Edit the hex
+    codes: --bg (background), --panel (cards), --text, --accent,
+    --accent-2. Save and refresh the page.
 
-    The palette lives at the very top in the ":root { ... }" block.
-    Change these values to re-skin the whole site:
-        --bg          page background       (currently warm cream)
-        --panel       cards / surfaces
-        --text        main text color
-        --accent      main accent (peach)
-        --accent-2    secondary accent (coral)
-    Just edit the hex codes (e.g. #f1e8db) and refresh the page.
-
-
->>> HEADLINE / HERO TEXT ON THE HOME PAGE
+>>> HOME PAGE HEADLINE / INTRO TEXT
     FILE:  resources\views\rooms\index.blade.php
-    Look for the <header class="hero"> section near the top:
-        the big <h1> headline, the <p class="lead"> paragraph,
-        and the "badges" row.
+    Look for <header class="hero"> - the big <h1>, the <p class="lead">,
+    and the badges row.
 
-
->>> THE VR/AR VIEWER PAGE (buttons, lighting, scene)
+>>> VIEWER BUTTONS / LIGHTING / SKY
     FILE:  resources\views\rooms\show.blade.php
-    - The dock buttons ("Room View", "Enter VR", "View in AR",
-      "Reset view") are in <div class="viewer-dock">.
-    - Lighting is the <a-entity light=...> lines (raise "intensity"
-      if a model looks too dark).
-    - The pastel sky/floor is the <a-entity id="env" ...> line.
+    - Buttons are in <div class="viewer-dock">.
+    - Lighting: the <a-entity light=...> lines (raise "intensity" if
+      a model looks dark).
+    - Sky/floor color: <a-entity id="env" ...>.
 
-
->>> HOW MOVEMENT / TELEPORT / VR WORKS (advanced)
+>>> MOVEMENT / TELEPORT / VR LOGIC (advanced)
     FILE:  public\assets\js\room-viewer.js
-    - Walk speed: the rig's "wasd-controls" in show.blade.php
-      (acceleration: 18 — higher = faster walking).
-    - Teleport, "Room View" stereo mode, AR handoff, and the model
-      loading/error handling all live in room-viewer.js.
+    Walk speed = "wasd-controls" acceleration in show.blade.php.
 
-
->>> THE PHONE QR ON THE HOME PAGE
-    FILES: resources\views\rooms\index.blade.php  (the <aside id="qr-sidebar">)
-           public\assets\js\site-qr.js            (builds the QR)
-    It auto-points at the live ngrok link, or the local URL if no tunnel.
-
---------------------------------------------------------------
-  C) ADD / REPLACE / COMPRESS A 3D MODEL
---------------------------------------------------------------
-
-  1. Export from Blender as .glb:
-        File > Export > glTF 2.0
+==============================================================
+  PART 7 - ADD / REPLACE / COMPRESS A 3D MODEL
+==============================================================
+   1. In Blender:  File > Export > glTF 2.0
         Format = "glTF Binary (.glb)"
-        Enable: +Y Up, Apply Modifiers, Materials, UVs, Normals
-        (Recommended) enable Draco compression.
-
-  2. Put the .glb in:  public\assets\models\
-     Use a simple filename (letters, numbers, dashes ONLY).
-     NO spaces and NO "#" — those break the web address.
-     GOOD: meeting-room-4.glb     BAD: My Room #4.glb
-
-  3. Point a room at it in config\rooms.php  ('model' => 'your-file.glb'),
-     then run:  php artisan config:clear
-
-  4. IF THE FILE IS BIG (over ~5 MB) it will load slowly. Compress it:
-        (one-time tool install, if not done already:)
+        Enable: +Y Up, Apply Modifiers, Materials, UVs, Normals.
+   2. Save it into:  public\assets\models\
+        Filename: letters, numbers, dashes ONLY.
+        NO spaces, NO "#".   GOOD: room-4.glb   BAD: My Room #4.glb
+   3. Point a room at it in config\rooms.php ('model' => 'room-4.glb'),
+      then run:  php artisan config:clear
+   4. If the file is big (over ~5 MB) it loads slowly. Compress it:
+        (install the tool once:)
         npm install -g @gltf-transform/cli
+        (then:)
+        cd C:\laragon\www\vr_showcase\public\assets\models
+        gltf-transform optimize "room-4.glb" "room-4-small.glb" --texture-compress webp --texture-size 1024 --compress draco
+      Then point the room's 'model' at room-4-small.glb.
 
-        (compress — keeps a backup, makes a smaller file:)
-        cd c:\laragon\www\vr_showcase\public\assets\models
-        gltf-transform optimize "your-file.glb" "your-file-small.glb" --texture-compress webp --texture-size 1024 --compress draco
+==============================================================
+  PART 8 - TROUBLESHOOTING
+==============================================================
+  * "php is not recognized" -> reopen PowerShell, or restart the PC
+    so Laragon's PATH takes effect. Make sure Laragon is installed.
 
-     Then point the room's 'model' at the smaller file.
+  * Browser shows an error / blank page on http://127.0.0.1:8000
+    -> run, in the project folder:
+         composer install
+         php artisan key:generate
+         php artisan config:clear
 
---------------------------------------------------------------
-  D) TROUBLESHOOTING
---------------------------------------------------------------
+  * "It loads forever / model never appears"
+    -> the model file is too big. Compress it (PART 7 step 4).
+    -> or the filename has a space/# - rename it (PART 7 step 2).
 
-  * "It loads forever / never appears"
-      - The model file is probably too big. Compress it (section C-4).
-      - Or the filename has a space/# — rename it (section C-2).
+  * "Room shows a plain placeholder with a sign"
+    -> the 'model' name in config\rooms.php doesn't match the file in
+       public\assets\models\, or the file is missing.
 
-  * "Room shows a plain placeholder room with a sign"
-      - The 'model' filename in config\rooms.php doesn't match the
-        actual file in public\assets\models\, OR the file is missing.
+  * "Model is invisible / sunk in floor / facing away"
+    -> adjust that room's 'spawn' and 'transform' (PART 6),
+       then: php artisan config:clear
 
-  * "Model is invisible / black / sunk in floor / facing away"
-      - Adjust that room's 'spawn' and 'transform' in config\rooms.php
-        (section B). Then: php artisan config:clear
+  * Launcher error: "Unexpected token '}' ..." when running
+    start-showcase.ps1
+    -> The .ps1 file has a non-ASCII character (e.g. a "fancy" dash,
+       smart quote, or accented letter) and Windows PowerShell misread
+       it. Keep the script PLAIN ASCII: use a normal hyphen "-" (not
+       an em-dash) and straight quotes ' " (not curly ones). If you
+       edited it, retype any special characters as plain ASCII and
+       save again. (If you didn't edit it, the shipped version is
+       already plain ASCII and should run fine.)
 
-  * Phone says "ERR_NGROK_8012 ... upstream localhost:80"
-      - ngrok was pointed at the wrong port. Always use the launcher
-        (start-showcase.ps1), or run exactly:  ngrok http 8000
-        The Laravel server must be running on port 8000 first.
+  * Phone: "ERR_NGROK_8012 ... upstream localhost:80"
+    -> use the launcher (start-showcase.ps1). The PHP server must be
+       on port 8000, and ngrok must point to 8000 (the script does
+       this for you). Do NOT run "ngrok http 80".
 
   * AR button does nothing on the phone
-      - iPhone/Safari does NOT support WebXR AR (Apple limitation).
-      - Android: use real Google Chrome + install "Google Play
-        Services for AR" (ARCore) from the Play Store.
+    -> iPhone/Safari does NOT support WebXR AR (Apple limitation).
+    -> Android: use real Google Chrome AND install "Google Play
+       Services for AR" (ARCore) from the Play Store.
 
-  * Changes to a room don't show up
-      - Run:  php artisan config:clear
-      - Hard-refresh the browser (Ctrl+F5), or pull-to-refresh on phone.
-
-  * Changes to CSS/JS don't show up
-      - Hard-refresh (Ctrl+F5). The browser caches these files.
+  * Edits don't show up
+    -> room edits: run  php artisan config:clear
+    -> any page: hard-refresh the browser (Ctrl+F5), or pull-to-
+       refresh on the phone (files are cached).
 
 ==============================================================
-  QUICK REFERENCE — most-used commands
+  QUICK REFERENCE - most-used commands
 ==============================================================
-  Run locally:        php artisan serve
+  Go to project:      cd C:\laragon\www\vr_showcase
+  Run on PC:          php artisan serve              (open http://127.0.0.1:8000)
   Run for phone:      powershell -ExecutionPolicy Bypass -File .\start-showcase.ps1
   Apply room edits:   php artisan config:clear
-  Compress a model:   gltf-transform optimize in.glb out.glb --texture-compress webp --texture-size 1024 --compress draco
+  First-time setup:   composer install ; php artisan key:generate
 ==============================================================

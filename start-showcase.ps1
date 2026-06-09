@@ -1,11 +1,10 @@
 # ============================================================
-#  VR/AR Meeting Room Showcase — launcher
+#  VR/AR Meeting Room Showcase - launcher
 #  Starts the Laravel dev server and an ngrok HTTPS tunnel so
-#  the AR QR code resolves to a phone-reachable address.
+#  the AR/site QR code resolves to a phone-reachable address.
 #
 #  Usage:   powershell -ExecutionPolicy Bypass -File .\start-showcase.ps1
-#  Stop:    press Ctrl+C (closes the tunnel; the server window stays —
-#           close it manually or re-run this script).
+#  Stop:    press Ctrl+C (closes the tunnel).
 # ============================================================
 
 $ErrorActionPreference = 'Stop'
@@ -46,7 +45,7 @@ function Test-PortListening($p) {
 }
 
 if (Test-PortListening $port) {
-    Write-Host "Laravel server already listening on http://127.0.0.1:$port — reusing it." -ForegroundColor Green
+    Write-Host "Laravel server already listening on http://127.0.0.1:$port - reusing it." -ForegroundColor Green
 } else {
     # Fall back: scan a few common ports a server might already be on.
     $found = $null
@@ -54,7 +53,7 @@ if (Test-PortListening $port) {
 
     if ($found) {
         $port = $found
-        Write-Host "Found a running server on http://127.0.0.1:$port — tunnelling to it." -ForegroundColor Green
+        Write-Host "Found a running server on http://127.0.0.1:$port - tunnelling to it." -ForegroundColor Green
     } else {
         Write-Host "Starting Laravel dev server on http://127.0.0.1:$port ..." -ForegroundColor Cyan
         Start-Process -FilePath "php" -ArgumentList "artisan", "serve", "--port=$port" -WorkingDirectory $root
@@ -69,8 +68,8 @@ if (Test-PortListening $port) {
 }
 
 Write-Host "Opening ngrok HTTPS tunnel -> 127.0.0.1:$port ..." -ForegroundColor Cyan
-Write-Host "When ngrok shows a 'Forwarding https://...' line, open that URL (or the room page)" -ForegroundColor Green
-Write-Host "on your computer; the AR button's QR will point your phone at the public address." -ForegroundColor Green
+Write-Host "When ngrok shows a 'Forwarding https://...' line, open the gallery on your PC;" -ForegroundColor Green
+Write-Host "the QR (bottom-right) will point your phone at that public address." -ForegroundColor Green
 Write-Host ""
 
 # Run ngrok in the foreground so its dashboard / forwarding URL is visible.
