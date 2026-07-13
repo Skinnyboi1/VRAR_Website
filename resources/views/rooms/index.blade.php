@@ -10,8 +10,12 @@
             <span>Immersa<span style="color:var(--muted)">Rooms</span></span>
         </a>
         <div class="nav-links">
-            <a href="#gallery">Gallery</a>
             <a href="#how">How it works</a>
+            @if (session('auth_user'))
+                <a href="{{ route('bookings.index') }}">My Bookings</a>
+            @else
+                <a href="{{ route('auth.login') }}">Book a room</a>
+            @endif
         </div>
     </div>
 </nav>

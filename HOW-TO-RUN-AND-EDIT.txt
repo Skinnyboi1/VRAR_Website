@@ -272,11 +272,65 @@ together, in one step.
        refresh on the phone (files are cached).
 
 ==============================================================
+  PART 9 - BOOKING SYSTEM + AUTH (Python AES/3DES crypto)
+==============================================================
+The app includes a room BOOKING system. Logging in / signing up is
+handled by a small PYTHON service that does the cryptography:
+  * Passwords  -> PBKDF2-HMAC-SHA256 (one-way hashing)
+  * Sessions   -> token sealed with AES-256-GCM, then wrapped in 3DES.
+The Python code lives in:  auth_service\  (see auth_service\README.txt)
+
+--- 9.1  One-time setup
+  1. Make sure SQLite is enabled in PHP (php.ini): the lines
+        extension=pdo_sqlite
+        extension=sqlite3
+     must NOT have a ';' in front. (Already done on this PC.)
+  2. Create the database tables (run once in the project folder):
+        php artisan migrate
+  3. Install the Python service dependencies:
+        cd auth_service
+        python -m pip install -r requirements.txt
+        cd ..
+
+--- 9.2  Running it (you need BOTH running)
+  Terminal 1 - the Python auth service:
+        cd C:\laragon\www\vr_showcase\auth_service
+        python app.py                 (serves on http://127.0.0.1:5001)
+  Terminal 2 - the Laravel app (as usual):
+        cd C:\laragon\www\vr_showcase
+        php artisan serve             (or start-showcase.ps1 for phone)
+
+  Then in the browser:
+   - Click "Book a room" (top-right) -> Register or Sign in.
+   - Pick a room, a date, and an available time slot -> Confirm.
+   - "My Bookings" lists your reservations; you can cancel them.
+   - A room+date+slot can only be booked once (no double-booking).
+
+--- 9.3  Where to edit booking things
+  Time slots offered:     app\Http\Controllers\BookingController.php
+                          (the SLOTS array)
+  Booking pages design:   resources\views\bookings\*.blade.php
+  Login/Register pages:   resources\views\auth\*.blade.php
+  The crypto itself:      auth_service\crypto_core.py
+  Auth service address:   .env  (AUTH_SERVICE_URL=http://127.0.0.1:5001)
+
+--- 9.4  Troubleshooting
+  * "auth service is not running" on login/register
+     -> start it:  cd auth_service ; python app.py
+  * "could not find driver" / SQLSTATE on migrate
+     -> enable extension=pdo_sqlite and extension=sqlite3 in php.ini,
+        then restart  php artisan serve.
+  * Bookings/login do nothing after enabling php.ini extensions
+     -> RESTART  php artisan serve  so it reloads php.ini.
+
+==============================================================
   QUICK REFERENCE - most-used commands
 ==============================================================
   Go to project:      cd C:\laragon\www\vr_showcase
   Run on PC:          php artisan serve              (open http://127.0.0.1:8000)
   Run for phone:      powershell -ExecutionPolicy Bypass -File .\start-showcase.ps1
+  Run auth service:   cd auth_service ; python app.py   (http://127.0.0.1:5001)
+  Create DB tables:   php artisan migrate
   Apply room edits:   php artisan config:clear
   First-time setup:   composer install ; php artisan key:generate
 ==============================================================
